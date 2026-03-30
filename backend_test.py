@@ -148,6 +148,62 @@ class FOMOArenaAPITester:
             200
         )
 
+    def test_duels_list(self):
+        """Test GET /api/duels endpoint"""
+        return self.run_test(
+            "Duels List",
+            "GET",
+            "api/duels",
+            200
+        )
+
+    def test_duels_open(self):
+        """Test GET /api/duels/open endpoint"""
+        return self.run_test(
+            "Open Duels",
+            "GET",
+            "api/duels/open",
+            200
+        )
+
+    def test_duels_summary(self):
+        """Test GET /api/duels/summary endpoint"""
+        headers = {
+            'Content-Type': 'application/json',
+            'x-wallet-address': '0xTestWallet123'
+        }
+        return self.run_test(
+            "Duels Summary",
+            "GET",
+            "api/duels/summary",
+            200,
+            headers=headers
+        )
+
+    def test_create_duel(self):
+        """Test POST /api/duels endpoint"""
+        test_duel = {
+            "marketId": f"test-market-{datetime.now().strftime('%H%M%S')}",
+            "predictionTitle": "Test prediction: Bitcoin will reach $100k by end of 2026",
+            "side": "yes",
+            "stakeAmount": 25,
+            "opponentWallet": ""
+        }
+        
+        headers = {
+            'Content-Type': 'application/json',
+            'x-wallet-address': f'0xTest{datetime.now().strftime("%H%M%S")}'
+        }
+        
+        return self.run_test(
+            "Create Duel",
+            "POST",
+            "api/duels",
+            201,
+            data=test_duel,
+            headers=headers
+        )
+
 def main():
     """Main test execution"""
     print("🚀 Starting FOMO Arena Backend API Tests")
@@ -204,6 +260,38 @@ def main():
     
     # Ticker data
     tester.test_ticker_data()
+    
+    # Duels API tests
+    print("\n⚔️  DUELS API TESTS")
+    print("-" * 25)
+    
+    # Test duels endpoints
+    duels_success, duels_data = tester.test_duels_list()
+    if duels_success and isinstance(duels_data, dict):
+        duels_count = len(duels_data.get('data', []))
+        print(f"✅ Duels list loaded: {duels_count} duels found")
+    
+    # Test open duels
+    open_duels_success, open_duels_data = tester.test_duels_open()
+    if open_duels_success and isinstance(open_duels_data, dict):
+        open_count = len(open_duels_data.get('data', []))
+        print(f"✅ Open duels loaded: {open_count} open duels found")
+    
+    # Test duels summary
+    summary_success, summary_data = tester.test_duels_summary()
+    if summary_success and isinstance(summary_data, dict):
+        summary = summary_data.get('data', {})
+        if 'activeDuels' in summary:
+            print(f"✅ Duels summary: {summary.get('activeDuels', 0)} active, {summary.get('wins', 0)} wins, {summary.get('losses', 0)} losses")
+    
+    # Test duel creation
+    create_success, create_data = tester.test_create_duel()
+    if create_success and isinstance(create_data, dict):
+        if create_data.get('success') and create_data.get('data'):
+            duel_id = create_data['data'].get('id') or create_data['data'].get('_id')
+            print(f"✅ Duel created successfully with ID: {duel_id}")
+        else:
+            print(f"⚠️  Duel creation response: {create_data}")
     
     # Print final results
     print("\n" + "=" * 60)

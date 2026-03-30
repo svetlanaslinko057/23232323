@@ -1297,6 +1297,16 @@
       "static/chunks/_app-pages-browser_src_lib_wagmi_index_ts.js"
     ]
   },
+  "app/tg/duels/page.tsx -> @/components/tg/TgCreateDuelModal": {
+    "id": "app/tg/duels/page.tsx -> @/components/tg/TgCreateDuelModal",
+    "files": [
+      "static/chunks/_app-pages-browser_src_components_tg_TgCreateDuelModal_tsx.js"
+    ]
+  },
+  "app/tg/layout.tsx -> @/lib/wagmi/Web3Provider": {
+    "id": "app/tg/layout.tsx -> @/lib/wagmi/Web3Provider",
+    "files": []
+  },
   "components/arena/index.tsx -> ./create-duel-modal/CreateDuelModal": {
     "id": "components/arena/index.tsx -> ./create-duel-modal/CreateDuelModal",
     "files": [

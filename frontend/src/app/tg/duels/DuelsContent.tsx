@@ -2,10 +2,17 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 import { TgPageContainer } from '@/components/tg';
 import { useTheme } from '@/lib/ThemeContext';
 import { useWallet } from '@/lib/wagmi';
 import { Swords, Clock, Trophy, Zap, Plus, RefreshCw, Loader2 } from 'lucide-react';
+
+// Dynamic import for modal to avoid SSR issues with wagmi
+const TgCreateDuelModal = dynamic(
+  () => import('@/components/tg/TgCreateDuelModal'),
+  { ssr: false }
+);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
@@ -201,6 +208,7 @@ export default function DuelsContent() {
   const [duels, setDuels] = useState<Duel[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const { theme } = useTheme();
   const { walletAddress, isConnected } = useWallet();
 
@@ -248,9 +256,20 @@ export default function DuelsContent() {
         </Header>
       </HeaderRow>
 
-      <CreateButton $accentColor={theme.accent} disabled={!isConnected} data-testid="create-duel">
+      <CreateButton 
+        $accentColor={theme.accent} 
+        disabled={!isConnected} 
+        data-testid="create-duel"
+        onClick={() => setIsCreateModalOpen(true)}
+      >
         <Plus size={18} /> Create Duel
       </CreateButton>
+
+      <TgCreateDuelModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={fetchDuels}
+      />
 
       <FilterTabs>
         {['all', 'open', 'live', 'my'].map(filter => (

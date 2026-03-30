@@ -2,10 +2,17 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
+import dynamic from 'next/dynamic';
 import { TgPageContainer } from '@/components/tg';
 import { useTheme } from '@/lib/ThemeContext';
 import { useWallet } from '@/lib/wagmi';
 import { Swords, Clock, Trophy, Zap, Plus, RefreshCw, Loader2 } from 'lucide-react';
+
+// Dynamic import for modal to avoid SSR issues with wagmi
+const TgCreateDuelModal = dynamic(
+  () => import('@/components/tg/TgCreateDuelModal'),
+  { ssr: false }
+);
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
@@ -325,16 +332,10 @@ interface Duel {
   _id: string;
   id: string;
   predictionTitle: string;
-  challenger: {
-    wallet: string;
-    name?: string;
-    side: string;
-  };
-  opponent?: {
-    wallet: string;
-    name?: string;
-    side: string;
-  };
+  creatorWallet: string;
+  opponentWallet?: string | null;
+  creatorSide: string;
+  opponentSide: string;
   stakeAmount: number;
   status: 'pending' | 'active' | 'resolved' | 'cancelled';
   expiresAt?: string;
@@ -371,6 +372,7 @@ export default function TgDuelsPage() {
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState('all');
   const [joiningDuel, setJoiningDuel] = useState<string | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const { theme } = useTheme();
   const { walletAddress, isConnected, token } = useWallet();
 
@@ -440,7 +442,7 @@ export default function TgDuelsPage() {
     if (activeFilter === 'open') return duel.status === 'pending';
     if (activeFilter === 'live') return duel.status === 'active';
     if (activeFilter === 'my') {
-      return duel.challenger.wallet === walletAddress || duel.opponent?.wallet === walletAddress;
+      return duel.creatorWallet === walletAddress || duel.opponentWallet === walletAddress;
     }
     return true;
   });
@@ -462,9 +464,16 @@ export default function TgDuelsPage() {
         data-testid="create-duel" 
         $accentColor={theme.accent}
         disabled={!isConnected}
+        onClick={() => setIsCreateModalOpen(true)}
       >
         <Plus size={18} /> Create Duel
       </CreateButton>
+
+      <TgCreateDuelModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={fetchDuels}
+      />
 
       <FilterTabs>
         <FilterTab 
@@ -558,10 +567,10 @@ export default function TgDuelsPage() {
                     $mutedColor={theme.textMuted}
                   >
                     <div className="avatar">
-                      {getShortName(duel.challenger.wallet, duel.challenger.name).slice(0, 2).toUpperCase()}
+                      {getShortName(duel.creatorWallet).slice(0, 2).toUpperCase()}
                     </div>
-                    <div className="name">{getShortName(duel.challenger.wallet, duel.challenger.name)}</div>
-                    <div className="side">{duel.challenger.side || 'YES'}</div>
+                    <div className="name">{getShortName(duel.creatorWallet)}</div>
+                    <div className="side">{duel.creatorSide || 'YES'}</div>
                   </Player>
                   
                   <VsIcon $dangerColor={theme.danger}>
@@ -575,13 +584,13 @@ export default function TgDuelsPage() {
                     $textColor={theme.textPrimary} 
                     $mutedColor={theme.textMuted}
                   >
-                    {duel.opponent ? (
+                    {duel.opponentWallet ? (
                       <>
                         <div className="avatar">
-                          {getShortName(duel.opponent.wallet, duel.opponent.name).slice(0, 2).toUpperCase()}
+                          {getShortName(duel.opponentWallet).slice(0, 2).toUpperCase()}
                         </div>
-                        <div className="name">{getShortName(duel.opponent.wallet, duel.opponent.name)}</div>
-                        <div className="side">{duel.opponent.side || 'NO'}</div>
+                        <div className="name">{getShortName(duel.opponentWallet)}</div>
+                        <div className="side">{duel.opponentSide || 'NO'}</div>
                       </>
                     ) : (
                       <>
@@ -602,7 +611,7 @@ export default function TgDuelsPage() {
                   </div>
                 </DuelStats>
 
-                {duel.status === 'pending' && !duel.opponent && duel.challenger.wallet !== walletAddress && (
+                {duel.status === 'pending' && !duel.opponentWallet && duel.creatorWallet !== walletAddress && (
                   <JoinButton 
                     data-testid="join-duel" 
                     $dangerColor={theme.danger}

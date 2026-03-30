@@ -563,7 +563,9 @@
   },
   "../node_modules/@rainbow-me/rainbowkit/dist/wallets/walletConnectors/chunk-FPL62XQV.js -> ./walletConnectWallet-YHWKVTDY.js": {
     "id": "../node_modules/@rainbow-me/rainbowkit/dist/wallets/walletConnectors/chunk-FPL62XQV.js -> ./walletConnectWallet-YHWKVTDY.js",
-    "files": []
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_rainbow-me_rainbowkit_dist_wallets_walletConnectors_walletCon-5d540a.js"
+    ]
   },
   "../node_modules/@rainbow-me/rainbowkit/dist/wallets/walletConnectors/chunk-GBA3YVS7.js -> ./compassWallet-KKRQGZSG.js": {
     "id": "../node_modules/@rainbow-me/rainbowkit/dist/wallets/walletConnectors/chunk-GBA3YVS7.js -> ./compassWallet-KKRQGZSG.js",
@@ -667,7 +669,9 @@
   },
   "../node_modules/@rainbow-me/rainbowkit/dist/wallets/walletConnectors/chunk-RTDGOYZC.js -> ./injectedWallet-AWJSZPMG.js": {
     "id": "../node_modules/@rainbow-me/rainbowkit/dist/wallets/walletConnectors/chunk-RTDGOYZC.js -> ./injectedWallet-AWJSZPMG.js",
-    "files": []
+    "files": [
+      "static/chunks/_app-pages-browser_node_modules_rainbow-me_rainbowkit_dist_wallets_walletConnectors_injectedW-640e6c.js"
+    ]
   },
   "../node_modules/@rainbow-me/rainbowkit/dist/wallets/walletConnectors/chunk-S6WAQ7RT.js -> ./tokenaryWallet-FHKZ7EWH.js": {
     "id": "../node_modules/@rainbow-me/rainbowkit/dist/wallets/walletConnectors/chunk-S6WAQ7RT.js -> ./tokenaryWallet-FHKZ7EWH.js",

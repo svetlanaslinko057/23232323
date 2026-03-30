@@ -258,9 +258,14 @@ export default function DuelsContent() {
 
       <CreateButton 
         $accentColor={theme.accent} 
-        disabled={!isConnected} 
         data-testid="create-duel"
-        onClick={() => setIsCreateModalOpen(true)}
+        onClick={() => {
+          if (!isConnected) {
+            alert('Please connect your wallet first to create a duel');
+            return;
+          }
+          setIsCreateModalOpen(true);
+        }}
       >
         <Plus size={18} /> Create Duel
       </CreateButton>

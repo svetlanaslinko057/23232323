@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider, darkTheme, connectorsForWallets } from '@rainbow-me/rainbowkit';
 import { WalletProvider } from './WalletContext';
 import { 
+  injectedWallet,
+  walletConnectWallet,
   trustWallet, 
   okxWallet,
   metaMaskWallet,
@@ -42,6 +44,7 @@ export function Web3ProviderInner({ children }: Web3ProviderInnerProps) {
         {
           groupName: 'Recommended',
           wallets: [
+            injectedWallet, // For any injected wallet (MetaMask, etc)
             metaMaskWallet,
             trustWallet,
             okxWallet,
@@ -50,6 +53,7 @@ export function Web3ProviderInner({ children }: Web3ProviderInnerProps) {
         {
           groupName: 'Other',
           wallets: [
+            walletConnectWallet,
             coinbaseWallet,
           ],
         },
@@ -86,6 +90,7 @@ export function Web3ProviderInner({ children }: Web3ProviderInnerProps) {
           })}
           modalSize="compact"
           locale="en"
+          coolMode
         >
           <WalletProvider>
             {children}

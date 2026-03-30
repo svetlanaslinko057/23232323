@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { ChevronLeft, Bell, Wallet, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, Bell, Wallet, AlertTriangle, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTheme } from '@/lib/ThemeContext';
 import { useWallet } from '@/lib/wagmi';
@@ -162,6 +162,109 @@ const WrongNetworkBanner = styled.div`
   }
 `;
 
+// Notifications Panel Styles
+const NotificationsPanelOverlay = styled.div<{ $isOpen: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: ${props => props.$isOpen ? 'block' : 'none'};
+`;
+
+const NotificationsPanel = styled.div<{ $isOpen: boolean; $bgColor: string }>`
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  max-width: 85vw;
+  background: ${props => props.$bgColor};
+  z-index: 1001;
+  transform: translateX(${props => props.$isOpen ? '0' : '100%'});
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+`;
+
+const NotificationHeader = styled.div<{ $borderColor: string; $textColor: string }>`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid ${props => props.$borderColor};
+  
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: ${props => props.$textColor};
+  }
+`;
+
+const CloseButton = styled.button<{ $textColor: string }>`
+  background: none;
+  border: none;
+  color: ${props => props.$textColor};
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:active { opacity: 0.7; }
+`;
+
+const NotificationsList = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+`;
+
+const EmptyNotifications = styled.div<{ $textColor: string }>`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: ${props => props.$textColor};
+  text-align: center;
+  
+  svg { margin-bottom: 12px; opacity: 0.5; }
+  p { margin: 0; font-size: 14px; }
+`;
+
+const NotificationItem = styled.div<{ $bgColor: string; $borderColor: string; $textColor: string }>`
+  background: ${props => props.$bgColor};
+  border: 1px solid ${props => props.$borderColor};
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+  
+  .title {
+    font-weight: 600;
+    font-size: 14px;
+    color: ${props => props.$textColor};
+    margin-bottom: 4px;
+  }
+  
+  .message {
+    font-size: 13px;
+    color: ${props => props.$textColor};
+    opacity: 0.7;
+    margin-bottom: 8px;
+  }
+  
+  .time {
+    font-size: 11px;
+    color: ${props => props.$textColor};
+    opacity: 0.5;
+  }
+`;
+
 interface TgTopBarProps {
   title?: string;
   showBack?: boolean;
@@ -171,6 +274,12 @@ interface TgTopBarProps {
 export function TgTopBar({ title, showBack, onBack }: TgTopBarProps) {
   const router = useRouter();
   const { theme, mode } = useTheme();
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notifications] = useState([
+    { id: 1, title: '🎯 Welcome to FOMO Arena!', message: 'Start making predictions and earn rewards.', time: 'Just now' },
+    { id: 2, title: '💰 New Duel Available', message: 'Someone created a duel you might be interested in.', time: '5 min ago' },
+  ]);
+  
   const { 
     isConnected, 
     shortAddress, 
@@ -237,12 +346,51 @@ export function TgTopBar({ title, showBack, onBack }: TgTopBarProps) {
             </WalletButton>
           )}
           
-          <IconButton data-testid="notifications-button" $textColor={theme.textPrimary}>
+          <IconButton 
+            data-testid="notifications-button" 
+            $textColor={theme.textPrimary}
+            onClick={() => setIsNotificationsOpen(true)}
+          >
             <Bell size={20} />
-            <NotificationDot />
+            {notifications.length > 0 && <NotificationDot />}
           </IconButton>
         </RightSection>
       </TopBarContainer>
+
+      {/* Notifications Panel */}
+      <NotificationsPanelOverlay 
+        $isOpen={isNotificationsOpen} 
+        onClick={() => setIsNotificationsOpen(false)}
+      />
+      <NotificationsPanel $isOpen={isNotificationsOpen} $bgColor={theme.bgPrimary}>
+        <NotificationHeader $borderColor={theme.border} $textColor={theme.textPrimary}>
+          <h3>Notifications</h3>
+          <CloseButton $textColor={theme.textPrimary} onClick={() => setIsNotificationsOpen(false)}>
+            <X size={24} />
+          </CloseButton>
+        </NotificationHeader>
+        <NotificationsList>
+          {notifications.length === 0 ? (
+            <EmptyNotifications $textColor={theme.textMuted}>
+              <Bell size={48} />
+              <p>No notifications yet</p>
+            </EmptyNotifications>
+          ) : (
+            notifications.map(notif => (
+              <NotificationItem 
+                key={notif.id}
+                $bgColor={theme.bgCard}
+                $borderColor={theme.border}
+                $textColor={theme.textPrimary}
+              >
+                <div className="title">{notif.title}</div>
+                <div className="message">{notif.message}</div>
+                <div className="time">{notif.time}</div>
+              </NotificationItem>
+            ))
+          )}
+        </NotificationsList>
+      </NotificationsPanel>
     </>
   );
 }

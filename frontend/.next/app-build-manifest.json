@@ -1,16 +1,5 @@
 {
   "pages": {
-    "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
-    ],
-    "/layout": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/layout.css",
-      "static/chunks/app/layout.js"
-    ],
     "/tg/duels/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
@@ -21,15 +10,16 @@
       "static/chunks/main-app.js",
       "static/chunks/app/tg/layout.js"
     ],
-    "/arena/[marketId]/page": [
+    "/layout": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/arena/[marketId]/page.js"
+      "static/css/app/layout.css",
+      "static/chunks/app/layout.js"
     ],
-    "/arena/layout": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/arena/layout.js"
+      "static/chunks/app/page.js"
     ]
   }
 }

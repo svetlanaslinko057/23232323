@@ -463,8 +463,14 @@ export default function TgDuelsPage() {
       <CreateButton 
         data-testid="create-duel" 
         $accentColor={theme.accent}
-        disabled={!isConnected}
-        onClick={() => setIsCreateModalOpen(true)}
+        onClick={() => {
+          if (!isConnected) {
+            // Show alert that wallet connection is required
+            alert('Please connect your wallet first to create a duel');
+            return;
+          }
+          setIsCreateModalOpen(true);
+        }}
       >
         <Plus size={18} /> Create Duel
       </CreateButton>
